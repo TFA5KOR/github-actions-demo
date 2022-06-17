@@ -1,8 +1,24 @@
+---
+marp: true
+author: Talmeez Faizy
+size: 4:3
+theme: uncover
+backgroundImage: url(https://c4.wallpaperflare.com/wallpaper/802/151/760/technology-git-hd-wallpaper-preview.jpg)
+---
+<style>
+    section {
+         font-size:18px;
+         color: white;
+     }
+
+</style>
+
+
 # Github Actions
 - A tool that lets you automate your software development workflows.
 - You can write individual task, called actions and combine them to create a custom workflow.
 
- 
+
 ### What are workflows?
 
 Custom automated process that you can setup in your repository to build, test, package, release or deploy any code project on GitHub
@@ -11,6 +27,7 @@ Workflow can have more than one job and each of them will run on their virtual m
 For e.g.- we have to run an app
 So one job can run on windows virtual machine building an android version of an app and another job can run on macOS virtual machine building an iOS version of the same app.
 
+---
 ### What is a runner?
 - Any machine with the GitHub actions runner application installed
 - A runner is responsible for running your jobs whenever an event happens and displays back the results
@@ -25,6 +42,7 @@ So one job can run on windows virtual machine building an android version of an 
 
 **For private repo GitHub-actions are not free!**
 
+---
 ### Yaml introduction:
 
 - It is similar to JSON with slight different format, i.e. key value pair language
@@ -42,6 +60,7 @@ objectsArray:
     key2: value2
   - key1: value1
 ```
+---
 - Longtext in yaml:
 
 ```sh
@@ -57,6 +76,7 @@ run: |
   cat /etc/os-release
 ```
 
+---
 ### Simple workflow:
 
 ```
@@ -80,6 +100,7 @@ jobs:
             node -v
             npm -v
 ```
+---
 ### Playing with workflows
 
 #### Using published actions, output of steps and checkout action
@@ -103,6 +124,7 @@ jobs:
 # actions/hello-world-javascript-action@v1
 # actions/hello-world-javascript-action@<commit-id>  
 ```
+---
 - You can use output of one step in other step
 ```
 jobs:
@@ -122,8 +144,9 @@ jobs:
 - Checkout action
   - By default git does not clone your repo in the working directory. All workflows may not require the files of repository
   - The checkout action can also take some inputs as well. You can for instance change the commit that you are checking-out to, override the authentication token with another one, choose the fetch depth and more. [Checout-Action](https://github.com/actions/checkout#usage)
-
-Combined workflow of above explanation:
+  
+---
+  Combined action of above explanation:
 
 ```
 name: Actions workflow
@@ -145,6 +168,7 @@ jobs:
         run: echo "${{ steps.greet.outputs.time }}"
 ```
 
+---
 #### Events, Schedules and Filters
 
 - Trigerring Workflow:
@@ -162,6 +186,7 @@ jobs:
        Cron: "0 12 1 1 *" at minute 0 of 12 on day of month 1 in January
     - You can take help here to frame cron expression : [Crontab](https://crontab.guru/)
 
+---
 ```
 name: Trigger workflow
 
@@ -197,6 +222,8 @@ jobs:
           who-to-greet: Faizy
 ```
 
+---
+
 #### Environment Variables, Ecnryption and context
 
 **Environment Variables and Encryption**
@@ -205,6 +232,7 @@ jobs:
 - Environment variable can be encrypted using github secrets
 - GITHUB_TOKEN need not be defined. Secrets inherently has it. ${{ secrets.GITHUB_TOKEN }}
 
+---
 ```
 name: Environment workflow
 on:
@@ -246,6 +274,8 @@ jobs:
 #https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
 ```
 
+---
+
 **Context**
 
 [Github_Context](https://docs.github.com/en/actions/learn-github-actions/contexts)
@@ -256,6 +286,9 @@ jobs:
 - As part of an expression, you can access context information using one of two syntaxes.
   - Index syntax: github['sha']
   - Property dereference syntax: github.sha
+
+---
+
 - You can use most contexts at any point in your workflow, including when default environment variables would be unavailable. For example, you can use contexts with expressions to perform initial processing before the job is routed to a runner for execution; this allows you to use a context with the conditional if keyword to determine whether a step should run. Once the job is running, you can also retrieve context variables from the runner that is executing the job, such as runner.os. 
 - Context use example:
 
@@ -270,6 +303,7 @@ jobs:
       - run: echo "Deploying to production server on branch $GITHUB_REF"
 ```
 
+---
 #### Strategy, matrix and Docker
 
 **ContinueOnError and Timeout**
@@ -280,9 +314,11 @@ jobs:
       runs-on: ubuntu-latest 
       timeout-minutes: 360 # by default is 360 minutes you can increase it or decrease it
 
-      continue-on-error: true # this make sure all steps will run even if this job fails # Timeout minutes can be added in steps or in whole job
+      continue-on-error: true # this make sure all steps will run even if this job fails 
+      # Timeout minutes can be added in steps or in whole job
 ```
 
+---
 **Strategy**
 
 Strategy helps to setup environment matrix.
@@ -306,10 +342,13 @@ jobs:
 ```
 Above workflow will setup node to 6 version but if we want to have different versions of node, then **strategy** helps.
 
+
+---
+
 **How to use strategy to create matrix of environment?**
 
 ```
-name: matirx workflow
+name: matrix workflow
 on: [push]
 # job will run for number of times depending on values present in matrix
 # if we define one more parameter with 3 values, then job will run for 
@@ -320,8 +359,10 @@ jobs:
     strategy:
       matrix:
        node_version: [6,8,10]
-      # max-parallel: 2 # used to limit max jobs you want to run the matrix in paralelle
-      # fail-fast: true # write what is the use of it?
+      # max-parallel: 2 # used to limit max jobs you want to run the matrix in paralell
+      # fail-fast: true 
+      # by default, matrix workflows fail fast. 
+      # That is to say: if one of the jobs in the matrix expansion fails, the rest of the jobs will be cancelled.
     runs-on: ubuntu-latest
     steps: 
       - name: Log node version
@@ -334,10 +375,12 @@ jobs:
         run: node -v 
 ```
 
+---
+
 **Include and Exclude in matrix**
 
 ```
-name: matirx workflow
+name: matrix workflow
 on: [push]
 # job will run for number of times depending on values present in matrix
 # if we define one more parameter with 3 values, then job will run for 
@@ -380,6 +423,8 @@ jobs:
 
 ```
 
+---
+
 **Docker Container in Jobs**
 
 ```
@@ -390,7 +435,8 @@ jobs:
     runs-on: ubuntu-latest
     #This can be image from docker hub
     # how to put: dockerhub username and then image
-    container: #node:13.5.0-alpine3.10 #this may show error in vs code because it expects to be an object not string
+    container: #node:13.5.0-alpine3.10 
+    #this may show error in vs code because it expects to be an object not string
     #other way to pass as an object
       image: node:13.5.0-alpine3.10
       #env: pass env variables
@@ -403,6 +449,8 @@ jobs:
           node -v 
           cat /etc/os-release
 ```
+
+---
 
 **Multiple Docker Container in Jobs**
 
@@ -427,10 +475,14 @@ jobs:
           - 27017:27017
     steps:
       - name: Post a user
-        run: "curl -X POST http://localhost:3001/api/user -H 'Content-Type: application/json' -d '{\"username\":\"hello\",\"address\":\"dwed\"}'"
+        run: |
+        "curl -X POST http://localhost:3001/api/user -H 'Content-Type: application/json' 
+        -d '{\"username\":\"hello\",\"address\":\"dwed\"}'"
       - name: Get users
         run: curl http://localhost:3001/api/users 
 ```
+
+---
 
 **Running Containers in Steps**
 In docker file we have entry point, which is the command that is executed as soon as container starts.
@@ -441,6 +493,8 @@ Other way of Entry Point:
 //called executable form of entry point
 ENTRYPOINT ['/bin/echo', 'Hello'] //path to executable and args to be passed to executable
 CMD ['WORLD'] //it contains additional args which has to be passed to executables
+
+---
 
 The above method is similar to the steps followed in github actions:
 
